@@ -1,0 +1,9 @@
+version: 2
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: stats19_collision
+      - name: iod2025_lsoa
+      - name: ons_lsoa11_lsoa21_best_fit
+      - name: dft_local_authority_traffic

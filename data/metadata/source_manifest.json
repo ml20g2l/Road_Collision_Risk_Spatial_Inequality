@@ -1,0 +1,49 @@
+{
+  "retrieved_at_utc": "2026-10-26T13:15:30.703697+00:00",
+  "snapshot": "DfT STATS19 2025 final",
+  "license": "Open Government Licence v3.0",
+  "sources": [
+    {
+      "file": "data\\raw\\dft-road-casualty-statistics-collision-2025.csv",
+      "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-collision-2025.csv",
+      "bytes": 19349153,
+      "sha256": "e699c19bdb82e47e449b6f3381ac87631865f6a31cef118c9955ba80ca870e2b"
+    },
+    {
+      "file": "data\\raw\\dft-road-casualty-statistics-vehicle-2025.csv",
+      "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-vehicle-2025.csv",
+      "bytes": 20688988,
+      "sha256": "dbeadb9745a8821ab8132f0dde59c246159e23059ab5db2c9a4381d44141a430"
+    },
+    {
+      "file": "data\\raw\\dft-road-casualty-statistics-casualty-2025.csv",
+      "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-casualty-2025.csv",
+      "bytes": 10318523,
+      "sha256": "b343039991f63f526bbcac0a5e6102e3a6e4c0b65d077e3ae37dbd53d1a7319a"
+    },
+    {
+      "file": "data\\metadata\\dft-road-safety-open-dataset-data-guide-2025.xlsx",
+      "url": "https://assets.publishing.service.gov.uk/media/6ab2a71d997a4b2950cced58/dft-road-casualty-statistics-road-safety-open-dataset-data-guide-2025.xlsx",
+      "bytes": 85112,
+      "sha256": "51b08606ef3dad1ae5d4c8726241b022fc8e4bbdc910ef0e5cc2fb92b054fc12"
+    },
+    {
+      "file": "data\\raw\\dft-road-casualty-statistics-collision-last-5-years.csv",
+      "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-collision-last-5-years.csv",
+      "bytes": 97669586,
+      "sha256": "06a03c0e5504175e23ed98e3e0b4767ac61d396c073405a1bddab9339c18f948"
+    },
+    {
+      "file": "data\\raw\\dft-road-casualty-statistics-vehicle-last-5-years.csv",
+      "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-vehicle-last-5-years.csv",
+      "bytes": 103741631,
+      "sha256": "05453dca2651ad8a27b4ac0e6a0450a852c506e4d495111ffca398f3d311e26a"
+    },
+    {
+      "file": "data\\raw\\dft-road-casualty-statistics-casualty-last-5-years.csv",
+      "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-casualty-last-5-years.csv",
+      "bytes": 53685509,
+      "sha256": "870be5a934ae10baf5c52163d59eccba0ab2f40327ffa6b2bd354d2e7ee6b108"
+    }
+  ]
+}
