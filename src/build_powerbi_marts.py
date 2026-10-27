@@ -22,15 +22,21 @@ def main():
     fact["is_fatal"] = fact.collision_severity.eq(1)
     fact["is_fatal_or_serious_raw"] = fact.collision_severity.isin([1,2])
     fact["expected_adjusted_ksi"] = fact.is_fatal.astype(float) + fact.collision_adjusted_severity_serious.astype(float)
+    fact["collision_severity_label"] = fact.collision_severity.map({1:"Fatal",2:"Serious",3:"Slight"}).fillna("Unknown")
+    fact["urban_or_rural_area_label"] = fact.urban_or_rural_area.map({1:"Urban",2:"Rural",3:"Unallocated"}).fillna("Unknown")
+    fact["road_type_label"] = fact.road_type.map({1:"Roundabout",2:"One way street",3:"Dual carriageway",6:"Single carriageway",7:"Slip road",9:"Unknown"}).fillna("Unknown")
+    fact["light_conditions_label"] = fact.light_conditions.map({1:"Daylight",4:"Darkness - lights lit",5:"Darkness - lights unlit",6:"Darkness - no lighting",7:"Darkness - lighting unknown"}).fillna("Unknown")
+    fact["weather_conditions_label"] = fact.weather_conditions.map({1:"Fine",2:"Raining",3:"Snowing",4:"Fine with high winds",5:"Raining with high winds",6:"Snowing with high winds",7:"Fog or mist",8:"Other",9:"Unknown"}).fillna("Unknown")
+    fact["road_surface_conditions_label"] = fact.road_surface_conditions.map({1:"Dry",2:"Wet or damp",3:"Snow",4:"Frost or ice",5:"Flood",6:"Oil or diesel",7:"Mud",9:"Unknown"}).fillna("Unknown")
     fact["aadf_match_tier"] = np.select(
         [fact.distance_m.le(100), fact.distance_m.le(250)],
         ["high_confidence_100m", "sensitivity_250m"], default="not_eligible")
     fact["aadf_counted_high_confidence"] = fact.distance_m.le(100) & fact.aadf_estimation_method.eq("Counted")
     fact_columns = [
         "collision_index","date_key","collision_year","local_authority_highway_current","lsoa_code_2021",
-        "imd_decile","longitude","latitude","collision_severity","is_fatal","is_fatal_or_serious_raw",
-        "expected_adjusted_ksi","speed_limit","road_type","urban_or_rural_area","light_conditions",
-        "weather_conditions","road_surface_conditions","count_point_id","distance_m","aadf_all_motor_vehicles",
+        "imd_decile","longitude","latitude","collision_severity","collision_severity_label","is_fatal","is_fatal_or_serious_raw",
+        "expected_adjusted_ksi","speed_limit","road_type","road_type_label","urban_or_rural_area","urban_or_rural_area_label","light_conditions","light_conditions_label",
+        "weather_conditions","weather_conditions_label","road_surface_conditions","road_surface_conditions_label","count_point_id","distance_m","aadf_all_motor_vehicles",
         "aadf_estimation_method","aadf_match_tier","aadf_counted_high_confidence","lsoa_mapping_method",
     ]
     fact[fact_columns].to_parquet(OUT / "fact_collision.parquet", index=False)
@@ -41,12 +47,19 @@ def main():
     dates["month_name"], dates["day_of_week"] = dates.date.dt.month_name(), dates.date.dt.day_name()
     dates["is_weekend"] = dates.date.dt.dayofweek.ge(5)
     dates.to_parquet(OUT / "dim_date.parquet", index=False)
+    years = pd.DataFrame({"collision_year": sorted(context.collision_year.dropna().astype(int).unique())})
+    years["year_label"] = years.collision_year.astype(str)
+    years.to_parquet(OUT / "dim_year.parquet", index=False)
     iod.rename(columns={"lsoa_code":"lsoa_code_2021"}).to_parquet(OUT / "dim_lsoa.parquet", index=False)
 
     authority_names = traffic[["local_authority_code","local_authority_name"]].drop_duplicates("local_authority_code")
     dim_la = context[["local_authority_highway_current","traffic_join_code"]].drop_duplicates()
     dim_la = dim_la.merge(authority_names, left_on="traffic_join_code", right_on="local_authority_code", how="left")
     dim_la = dim_la.drop(columns="local_authority_code").drop_duplicates("local_authority_highway_current")
+    authority_centres = context.groupby("local_authority_highway_current", dropna=False).agg(
+        longitude=("longitude", "median"), latitude=("latitude", "median")
+    ).reset_index()
+    dim_la = dim_la.merge(authority_centres, on="local_authority_highway_current", how="left", validate="one_to_one")
     dim_la.to_parquet(OUT / "dim_local_authority.parquet", index=False)
 
     risk = fact.groupby(["collision_year","local_authority_highway_current"], dropna=False).agg(
@@ -83,8 +96,12 @@ def main():
       "model":"Road Collision Risk & Spatial Inequality","grain":{"fact_collision":"collision_index","fact_local_authority_year_risk":"collision_year + local_authority_highway_current","fact_exposure_sensitivity":"collision_year + scenario_key"},
       "relationships":[
         {"from":"fact_collision.date_key","to":"dim_date.date_key","cardinality":"many-to-one"},
+        {"from":"fact_collision.collision_year","to":"dim_year.collision_year","cardinality":"many-to-one"},
         {"from":"fact_collision.lsoa_code_2021","to":"dim_lsoa.lsoa_code_2021","cardinality":"many-to-one"},
         {"from":"fact_collision.local_authority_highway_current","to":"dim_local_authority.local_authority_highway_current","cardinality":"many-to-one"},
+        {"from":"fact_local_authority_year_risk.collision_year","to":"dim_year.collision_year","cardinality":"many-to-one"},
+        {"from":"fact_local_authority_year_risk.local_authority_highway_current","to":"dim_local_authority.local_authority_highway_current","cardinality":"many-to-one"},
+        {"from":"fact_exposure_sensitivity.collision_year","to":"dim_year.collision_year","cardinality":"many-to-one"},
         {"from":"fact_exposure_sensitivity.scenario_key","to":"dim_exposure_scenario.scenario_key","cardinality":"many-to-one"}],
       "certified_metrics":{"Collision Count":"COUNTROWS(fact_collision)","Raw KSI":"SUM(fact_collision[is_fatal_or_serious_raw])","Adjusted Expected KSI":"SUM(fact_collision[expected_adjusted_ksi])","Raw KSI per Billion Vehicle Miles":"DIVIDE(SUMX(FILTER(fact_local_authority_year_risk, fact_local_authority_year_risk[exposure_available]), fact_local_authority_year_risk[raw_ksi]),SUM(fact_local_authority_year_risk[annual_vehicle_miles]))*1000000000","Adjusted KSI per Billion Vehicle Miles":"DIVIDE(SUMX(FILTER(fact_local_authority_year_risk, fact_local_authority_year_risk[exposure_available]), fact_local_authority_year_risk[adjusted_expected_ksi]),SUM(fact_local_authority_year_risk[annual_vehicle_miles]))*1000000000"},
       "guardrail":"AADF scenarios are coverage/sensitivity diagnostics only until road-segment geometry matching is implemented; do not expose them as absolute risk rates."

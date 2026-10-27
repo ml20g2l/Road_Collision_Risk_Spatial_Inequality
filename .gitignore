@@ -18,3 +18,7 @@ reports/*_ko.md
 reports/report_snapshot.json
 reports/*_figures/
 reports/*.html
+prototype/
+src/build_dashboard_prototype_data.py
+src/extract_notebook_figures.py
+src/translate_week1_notebook.py

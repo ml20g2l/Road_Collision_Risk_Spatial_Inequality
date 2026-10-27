@@ -12,6 +12,11 @@
       "cardinality": "many-to-one"
     },
     {
+      "from": "fact_collision.collision_year",
+      "to": "dim_year.collision_year",
+      "cardinality": "many-to-one"
+    },
+    {
       "from": "fact_collision.lsoa_code_2021",
       "to": "dim_lsoa.lsoa_code_2021",
       "cardinality": "many-to-one"
@@ -19,6 +24,21 @@
     {
       "from": "fact_collision.local_authority_highway_current",
       "to": "dim_local_authority.local_authority_highway_current",
+      "cardinality": "many-to-one"
+    },
+    {
+      "from": "fact_local_authority_year_risk.collision_year",
+      "to": "dim_year.collision_year",
+      "cardinality": "many-to-one"
+    },
+    {
+      "from": "fact_local_authority_year_risk.local_authority_highway_current",
+      "to": "dim_local_authority.local_authority_highway_current",
+      "cardinality": "many-to-one"
+    },
+    {
+      "from": "fact_exposure_sensitivity.collision_year",
+      "to": "dim_year.collision_year",
       "cardinality": "many-to-one"
     },
     {

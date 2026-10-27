@@ -1,0 +1,233 @@
+// STEP 1 — Create this disconnected calculated table first with Modeling > New table.
+// Risk Metric Selector =
+// DATATABLE (
+//     "Risk Metric", STRING,
+//     {{"Adjusted expected KSI"}, {"Raw reported KSI"}}
+// )
+// Do not create any relationship from this table.
+//
+// STEP 2 — Create a dedicated table called _Measures, then create the measures below
+// one at a time. Selected Risk Metric and Selected Risk Metric Label must be created
+// only after the Risk Metric Selector table exists.
+
+Collision Count =
+COUNTROWS ( fact_collision )
+
+// Presentation-only text measure for Card versions that do not expose Display units.
+// Keep using the numeric Collision Count measure for calculations, charts, and ranking.
+Collision Count Display =
+FORMAT ( [Collision Count], "#,0" )
+
+Selected Period Label =
+VAR MinYear = MIN ( dim_year[collision_year] )
+VAR MaxYear = MAX ( dim_year[collision_year] )
+RETURN
+    IF (
+        HASONEVALUE ( dim_year[collision_year] ),
+        FORMAT ( MaxYear, "0" ) & " selected",
+        FORMAT ( MinYear, "0" ) & UNICHAR ( 8211 ) & FORMAT ( MaxYear, "0" ) & " selected"
+    )
+
+Deprivation Ratio Context =
+"Resident-normalised rate ratio"
+
+Exposure Coverage Context =
+"Authority-year vehicle miles"
+
+Fatal Collisions =
+COUNTROWS (
+    FILTER ( fact_collision, fact_collision[is_fatal] = TRUE () )
+)
+
+Raw KSI =
+COUNTROWS (
+    FILTER ( fact_collision, fact_collision[is_fatal_or_serious_raw] = TRUE () )
+)
+
+Adjusted Expected KSI =
+SUM ( fact_collision[expected_adjusted_ksi] )
+
+Adjusted KSI per 100 Collisions =
+DIVIDE ( [Adjusted Expected KSI], [Collision Count] ) * 100
+
+Collisions per Billion Vehicle Miles =
+DIVIDE (
+    SUM ( fact_local_authority_year_risk[collisions] ),
+    SUM ( fact_local_authority_year_risk[annual_vehicle_miles] )
+) * 1000000000
+
+Raw KSI per Billion Vehicle Miles =
+DIVIDE (
+    SUM ( fact_local_authority_year_risk[raw_ksi] ),
+    SUM ( fact_local_authority_year_risk[annual_vehicle_miles] )
+) * 1000000000
+
+Adjusted KSI per Billion Vehicle Miles =
+DIVIDE (
+    SUM ( fact_local_authority_year_risk[adjusted_expected_ksi] ),
+    SUM ( fact_local_authority_year_risk[annual_vehicle_miles] )
+) * 1000000000
+
+Severity Adjustment Percent =
+DIVIDE (
+    [Adjusted KSI per Billion Vehicle Miles] - [Raw KSI per Billion Vehicle Miles],
+    [Raw KSI per Billion Vehicle Miles]
+)
+
+Resident Years =
+SUM ( dim_lsoa[population_mid_2022] )
+    * DISTINCTCOUNT ( dim_year[collision_year] )
+
+Collisions per 100k Resident-Years =
+DIVIDE ( [Collision Count], [Resident Years] ) * 100000
+
+Most Deprived Collision Burden =
+CALCULATE (
+    [Collisions per 100k Resident-Years],
+    REMOVEFILTERS ( dim_lsoa[imd_decile] ),
+    dim_lsoa[imd_decile] = 1
+)
+
+Least Deprived Collision Burden =
+CALCULATE (
+    [Collisions per 100k Resident-Years],
+    REMOVEFILTERS ( dim_lsoa[imd_decile] ),
+    dim_lsoa[imd_decile] = 10
+)
+
+Most-to-Least Deprived Ratio =
+DIVIDE ( [Most Deprived Collision Burden], [Least Deprived Collision Burden] )
+
+// Use this measure in charts that need a plain numeric axis without the "x" suffix.
+Most-to-Least Deprived Ratio Chart =
+[Most-to-Least Deprived Ratio]
+
+Five-Year Deprivation Burden Ratio =
+CALCULATE (
+    [Most-to-Least Deprived Ratio],
+    REMOVEFILTERS ( dim_year )
+)
+
+Rural Adjusted KSI per 100 Collisions =
+CALCULATE (
+    [Adjusted KSI per 100 Collisions],
+    KEEPFILTERS ( fact_collision[urban_or_rural_area_label] = "Rural" )
+)
+
+Exposure Coverage =
+DIVIDE (
+    SUM ( fact_exposure_sensitivity[covered_collisions] ),
+    SUM ( fact_exposure_sensitivity[eligible_collisions] )
+)
+
+Covered Collisions =
+SUM ( fact_exposure_sensitivity[covered_collisions] )
+
+Eligible Collisions =
+SUM ( fact_exposure_sensitivity[eligible_collisions] )
+
+Local Authority Traffic Coverage =
+CALCULATE (
+    [Exposure Coverage],
+    REMOVEFILTERS ( dim_exposure_scenario ),
+    dim_exposure_scenario[scenario_key] = "la_vehicle_miles"
+)
+
+AADF 100m Eligible Coverage =
+CALCULATE (
+    [Exposure Coverage],
+    REMOVEFILTERS ( dim_exposure_scenario ),
+    dim_exposure_scenario[scenario_key] = "aadf_100m_all"
+)
+
+England to IoD Join Coverage =
+VAR EligibleCollisions =
+    CALCULATE (
+        [Collision Count],
+        fact_collision[lsoa_mapping_method] <> "not_applicable"
+    )
+VAR MappedCollisions =
+    CALCULATE (
+        [Collision Count],
+        fact_collision[lsoa_mapping_method]
+            IN { "direct_2021_code", "ons_best_fit_2011_to_2021" }
+    )
+RETURN
+    DIVIDE ( MappedCollisions, EligibleCollisions )
+
+// Fixed audit result calculated for the latest reviewed year in the analytical pipeline.
+Latest Year Authority Rank Correlation =
+0.9913
+
+Previous Year Adjusted KSI Rate =
+VAR CurrentYear = SELECTEDVALUE ( dim_year[collision_year] )
+RETURN
+    IF (
+        NOT ISBLANK ( CurrentYear ),
+        CALCULATE (
+            [Adjusted KSI per Billion Vehicle Miles],
+            FILTER ( ALL ( dim_year ), dim_year[collision_year] = CurrentYear - 1 )
+        )
+    )
+
+Adjusted KSI Rate YoY Percent =
+IF (
+    HASONEVALUE ( dim_year[collision_year] ),
+    DIVIDE (
+        [Adjusted KSI per Billion Vehicle Miles] - [Previous Year Adjusted KSI Rate],
+        [Previous Year Adjusted KSI Rate]
+    )
+)
+
+Adjusted KSI Rate YoY Label =
+VAR Change = [Adjusted KSI Rate YoY Percent]
+RETURN
+    IF (
+        NOT ISBLANK ( Change ),
+        IF ( Change > 0, UNICHAR ( 9650 ) & " ", IF ( Change < 0, UNICHAR ( 9660 ) & " ", "" ) )
+            & FORMAT ( ABS ( Change ), "0.0%" )
+            & " vs previous year"
+    )
+
+Adjusted KSI Rate YoY Color =
+VAR Change = [Adjusted KSI Rate YoY Percent]
+RETURN
+    SWITCH (
+        TRUE (),
+        ISBLANK ( Change ), "#858AA5",
+        Change > 0, "#F05D7B",
+        Change < 0, "#41D6C3",
+        "#858AA5"
+    )
+
+Authority Ranking Eligible =
+IF ( [Collision Count] >= 100, 1, 0 )
+
+Selected Risk Metric =
+SWITCH (
+    SELECTEDVALUE ( 'Risk Metric Selector'[Risk Metric], "Adjusted expected KSI" ),
+    "Raw reported KSI", [Raw KSI per Billion Vehicle Miles],
+    [Adjusted KSI per Billion Vehicle Miles]
+)
+
+Selected Risk Metric Label =
+SELECTEDVALUE ( 'Risk Metric Selector'[Risk Metric], "Adjusted expected KSI" )
+
+Authority Risk Rank =
+VAR EligibleAuthorities =
+    FILTER (
+        ALLSELECTED ( dim_local_authority[local_authority_name] ),
+        CALCULATE ( [Collision Count] ) >= 100
+    )
+RETURN
+IF (
+    [Authority Ranking Eligible] = 1,
+    RANKX (
+        EligibleAuthorities,
+        [Selected Risk Metric],
+        ,
+        DESC,
+        DENSE
+    )
+)
+

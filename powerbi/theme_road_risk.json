@@ -1,0 +1,29 @@
+{
+  "name": "Road Risk Dark",
+  "dataColors": ["#41D6C3", "#68A0FF", "#9B87F5", "#F7A23B", "#F05D7B", "#A8ADC4"],
+  "background": "#111322",
+  "foreground": "#F7F8FC",
+  "tableAccent": "#41D6C3",
+  "good": "#41D6C3",
+  "neutral": "#A8ADC4",
+  "bad": "#F05D7B",
+  "maximum": "#F05D7B",
+  "center": "#9B87F5",
+  "minimum": "#41D6C3",
+  "textClasses": {
+    "title": {"fontFace": "Segoe UI Semibold", "fontSize": 14, "color": "#F7F8FC"},
+    "header": {"fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#F7F8FC"},
+    "label": {"fontFace": "Segoe UI", "fontSize": 10, "color": "#A8ADC4"},
+    "callout": {"fontFace": "Segoe UI Semibold", "fontSize": 24, "color": "#F7F8FC"}
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{"show": true, "color": {"solid": {"color": "#22213A"}}, "transparency": 0}],
+        "border": [{"show": true, "color": {"solid": {"color": "#383657"}}, "radius": 8}],
+        "title": [{"show": true, "fontFamily": "Segoe UI Semibold", "fontSize": 14, "fontColor": {"solid": {"color": "#F7F8FC"}}, "alignment": "left"}],
+        "visualHeader": [{"show": false}]
+      }
+    }
+  }
+}

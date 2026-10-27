@@ -4,6 +4,37 @@ An end-to-end geospatial analytics engineering project that combines official Gr
 
 The project uses Python for reproducible ingestion and analysis, dbt/PostGIS-style models for transparent transformations, and a Power BI-ready star schema for decision-focused reporting.
 
+## Power BI dashboard
+
+The completed four-page report connects exposure-adjusted road risk, community collision burden, conditional severity, and data-quality guardrails in one decision-focused interface.
+
+- [Open the dashboard PDF](powerbi/road_collision_risk_spatial_inequality.pdf)
+- [Download the Power BI Desktop file](powerbi/road_collision_risk_spatial_inequality.pbix)
+- [Review the DAX measures](powerbi/measures.dax)
+
+### Executive overview
+
+![Executive overview dashboard](assets/dashboard/01-executive-overview.png)
+
+<details>
+<summary>View the remaining dashboard pages</summary>
+
+### Spatial inequality
+
+![Spatial inequality dashboard](assets/dashboard/02-spatial-inequality.png)
+
+### Road risk and severity
+
+![Road risk and severity dashboard](assets/dashboard/03-road-risk-severity.png)
+
+### Data quality and sensitivity
+
+![Data quality and sensitivity dashboard](assets/dashboard/04-data-quality.png)
+
+</details>
+
+The `.pbix` file is designed for local use in Power BI Desktop. The PDF and preview images provide a static view of the completed report without requiring Power BI Service access.
+
 ## Why this project matters
 
 Collision counts alone can overstate risk in places with more traffic and understate the social burden in deprived communities. This project separates three related questions:
@@ -52,8 +83,10 @@ Downloaded code lists and publisher workbooks are also excluded from version con
 ```text
 data/metadata/       Source manifest and provenance metadata
 data/public/         Small, publication-ready analytical extracts
+assets/dashboard/    Static previews of the completed Power BI report
 models/              dbt-style staging, intermediate, mart, and QA models
 notebooks/           Executable audit and insight notebooks
+powerbi/             PBIX report, PDF export, DAX, Power Query, and theme
 reports/             Public English-language findings
 src/                 Download, transformation, validation, and export code
 ```
@@ -91,9 +124,9 @@ The export contains three facts and conformed dimensions:
 - `fact_collision`
 - `fact_local_authority_year_risk`
 - `fact_exposure_sensitivity`
-- `dim_date`, `dim_lsoa`, `dim_local_authority`, and `dim_exposure_scenario`
+- `dim_date`, `dim_year`, `dim_lsoa`, `dim_local_authority`, and `dim_exposure_scenario`
 
-The model contract defines keys, grain, relationships, recommended measures, and display formats. The dashboard is the next delivery stage.
+The model contract defines keys, grain, and relationships. The version-controlled DAX, Power Query templates, and report theme document the implementation used by the completed dashboard.
 
 ## Limitations
 
@@ -105,4 +138,4 @@ The model contract defines keys, grain, relationships, recommended measures, and
 
 ## Project status
 
-Weeks 1–3 are complete: problem definition, source audit, geographic integration, exposure modelling, sensitivity analysis, analytical findings, and a validated Power BI-ready semantic model. Dashboard design and implementation are next.
+Complete. The repository includes the source audit, geographic integration, exposure modelling, sensitivity analysis, decision insights, validated Power BI semantic model, and final four-page dashboard.
