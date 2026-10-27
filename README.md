@@ -16,9 +16,6 @@ The completed four-page report connects exposure-adjusted road risk, community c
 
 ![Executive overview dashboard](assets/dashboard/01-executive-overview.png)
 
-<details>
-<summary>View the remaining dashboard pages</summary>
-
 ### Spatial inequality
 
 ![Spatial inequality dashboard](assets/dashboard/02-spatial-inequality.png)
@@ -31,9 +28,9 @@ The completed four-page report connects exposure-adjusted road risk, community c
 
 ![Data quality and sensitivity dashboard](assets/dashboard/04-data-quality.png)
 
-</details>
-
 The `.pbix` file is designed for local use in Power BI Desktop. The PDF and preview images provide a static view of the completed report without requiring Power BI Service access.
+
+For a detailed explanation of the concepts, methods, lessons, reuse options, and relevant career paths, read the [project learning guide](reports/project_learning_guide.md).
 
 ## Why this project matters
 
