@@ -8,13 +8,20 @@ The project uses Python for reproducible ingestion and analysis, dbt/PostGIS-sty
 
 The completed four-page report connects exposure-adjusted road risk, community collision burden, conditional severity, and data-quality guardrails in one decision-focused interface.
 
-- [Open the dashboard PDF](powerbi/road_collision_risk_spatial_inequality.pdf)
+- [Open the 2021–2025 all-period dashboard PDF](powerbi/road_collision_risk_spatial_inequality_all.pdf)
+- [Open the 2025 filtered dashboard PDF](powerbi/road_collision_risk_spatial_inequality_2025.pdf)
 - [Download the Power BI Desktop file](powerbi/road_collision_risk_spatial_inequality.pbix)
 - [Review the DAX measures](powerbi/measures.dax)
 
-### Executive overview
+### Executive overview · 2021–2025
 
 ![Executive overview dashboard](assets/dashboard/01-executive-overview.png)
+
+### Executive overview · 2025 filtered view
+
+This snapshot demonstrates single-year filtering and the corresponding year-over-year risk context.
+
+![2025 executive overview dashboard](assets/dashboard/01-executive-overview-2025.png)
 
 ### Spatial inequality
 
@@ -81,7 +88,7 @@ data/public/         Small, publication-ready analytical extracts
 assets/dashboard/    Static previews of the completed Power BI report
 models/              dbt-style staging, intermediate, mart, and QA models
 notebooks/           Executable audit and insight notebooks
-powerbi/             PBIX report, PDF export, DAX, Power Query, and theme
+powerbi/             PBIX report, all-period and 2025 PDF exports, DAX, Power Query, and theme
 reports/             Public English-language findings
 src/                 Download, transformation, validation, and export code
 ```
@@ -134,3 +141,7 @@ The model contract defines keys, grain, and relationships. The version-controlle
 ## Project status
 
 Complete. The repository includes the source audit, geographic integration, exposure modelling, sensitivity analysis, decision insights, validated Power BI semantic model, and final four-page dashboard.
+
+## License
+
+Project code is available under the [MIT License](LICENSE). Source datasets remain subject to their publishers' licences and attribution requirements.
