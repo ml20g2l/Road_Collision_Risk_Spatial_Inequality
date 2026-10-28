@@ -1,5 +1,6 @@
 [tool.pytest.ini_options]
 testpaths = ["tests_py"]
+pythonpath = ["."]
 addopts = "--strict-markers --disable-warnings --basetemp=.pytest_tmp"
 
 [tool.coverage.run]
