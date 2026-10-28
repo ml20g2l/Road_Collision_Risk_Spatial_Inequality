@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-lock.txt
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-lock.txt
+      - name: Lint Python
+        run: ruff check src tests_py tests/create_dbt_fixtures.py
+      - name: Run Python tests
+        run: pytest --cov=src.download_sources --cov=src.pipeline --cov-report=term-missing --cov-report=xml
+      - name: Build deterministic dbt fixtures
+        run: python tests/create_dbt_fixtures.py
+      - name: Build and test dbt project
+        run: "dbt build --profiles-dir . --target ci --vars '{powerbi_dir: tests/fixtures/powerbi}'"
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml

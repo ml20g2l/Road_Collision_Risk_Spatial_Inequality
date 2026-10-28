@@ -1,49 +1,127 @@
 {
-  "retrieved_at_utc": "2026-10-26T13:15:30.703697+00:00",
-  "snapshot": "DfT STATS19 2025 final",
-  "license": "Open Government Licence v3.0",
+  "snapshot": "Pinned 2021-2025 official-source build",
+  "snapshot_date": "2026-10-26",
+  "retrieved_at_utc": "2026-10-28T14:39:55.067171+00:00",
   "sources": [
     {
-      "file": "data\\raw\\dft-road-casualty-statistics-collision-2025.csv",
+      "name": "stats19_collision_2025",
+      "publisher": "Department for Transport",
       "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-collision-2025.csv",
+      "file": "data/raw/dft-road-casualty-statistics-collision-2025.csv",
       "bytes": 19349153,
-      "sha256": "e699c19bdb82e47e449b6f3381ac87631865f6a31cef118c9955ba80ca870e2b"
+      "sha256": "e699c19bdb82e47e449b6f3381ac87631865f6a31cef118c9955ba80ca870e2b",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
     },
     {
-      "file": "data\\raw\\dft-road-casualty-statistics-vehicle-2025.csv",
+      "name": "stats19_vehicle_2025",
+      "publisher": "Department for Transport",
       "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-vehicle-2025.csv",
+      "file": "data/raw/dft-road-casualty-statistics-vehicle-2025.csv",
       "bytes": 20688988,
-      "sha256": "dbeadb9745a8821ab8132f0dde59c246159e23059ab5db2c9a4381d44141a430"
+      "sha256": "dbeadb9745a8821ab8132f0dde59c246159e23059ab5db2c9a4381d44141a430",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
     },
     {
-      "file": "data\\raw\\dft-road-casualty-statistics-casualty-2025.csv",
+      "name": "stats19_casualty_2025",
+      "publisher": "Department for Transport",
       "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-casualty-2025.csv",
+      "file": "data/raw/dft-road-casualty-statistics-casualty-2025.csv",
       "bytes": 10318523,
-      "sha256": "b343039991f63f526bbcac0a5e6102e3a6e4c0b65d077e3ae37dbd53d1a7319a"
+      "sha256": "b343039991f63f526bbcac0a5e6102e3a6e4c0b65d077e3ae37dbd53d1a7319a",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
     },
     {
-      "file": "data\\metadata\\dft-road-safety-open-dataset-data-guide-2025.xlsx",
+      "name": "stats19_data_guide_2025",
+      "publisher": "Department for Transport",
       "url": "https://assets.publishing.service.gov.uk/media/6ab2a71d997a4b2950cced58/dft-road-casualty-statistics-road-safety-open-dataset-data-guide-2025.xlsx",
+      "file": "data/metadata/dft-road-safety-open-dataset-data-guide-2025.xlsx",
       "bytes": 85112,
-      "sha256": "51b08606ef3dad1ae5d4c8726241b022fc8e4bbdc910ef0e5cc2fb92b054fc12"
+      "sha256": "51b08606ef3dad1ae5d4c8726241b022fc8e4bbdc910ef0e5cc2fb92b054fc12",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
     },
     {
-      "file": "data\\raw\\dft-road-casualty-statistics-collision-last-5-years.csv",
+      "name": "stats19_collision_2021_2025",
+      "publisher": "Department for Transport",
       "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-collision-last-5-years.csv",
+      "file": "data/raw/dft-road-casualty-statistics-collision-last-5-years.csv",
       "bytes": 97669586,
-      "sha256": "06a03c0e5504175e23ed98e3e0b4767ac61d396c073405a1bddab9339c18f948"
+      "sha256": "06a03c0e5504175e23ed98e3e0b4767ac61d396c073405a1bddab9339c18f948",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
     },
     {
-      "file": "data\\raw\\dft-road-casualty-statistics-vehicle-last-5-years.csv",
+      "name": "stats19_vehicle_2021_2025",
+      "publisher": "Department for Transport",
       "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-vehicle-last-5-years.csv",
+      "file": "data/raw/dft-road-casualty-statistics-vehicle-last-5-years.csv",
       "bytes": 103741631,
-      "sha256": "05453dca2651ad8a27b4ac0e6a0450a852c506e4d495111ffca398f3d311e26a"
+      "sha256": "05453dca2651ad8a27b4ac0e6a0450a852c506e4d495111ffca398f3d311e26a",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
     },
     {
-      "file": "data\\raw\\dft-road-casualty-statistics-casualty-last-5-years.csv",
+      "name": "stats19_casualty_2021_2025",
+      "publisher": "Department for Transport",
       "url": "https://data.dft.gov.uk/road-accidents-safety-data/dft-road-casualty-statistics-casualty-last-5-years.csv",
+      "file": "data/raw/dft-road-casualty-statistics-casualty-last-5-years.csv",
       "bytes": 53685509,
-      "sha256": "870be5a934ae10baf5c52163d59eccba0ab2f40327ffa6b2bd354d2e7ee6b108"
+      "sha256": "870be5a934ae10baf5c52163d59eccba0ab2f40327ffa6b2bd354d2e7ee6b108",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
+    },
+    {
+      "name": "iod2025_file7_v2",
+      "publisher": "Ministry of Housing, Communities and Local Government",
+      "url": "https://assets.publishing.service.gov.uk/media/691ded56d140bbbaa59a2a7d/File_7_IoD2025_All_Ranks_Scores_Deciles_Population_Denominators.csv",
+      "file": "data/raw/auxiliary/iod2025_file7_v2.csv",
+      "bytes": 9897666,
+      "sha256": "b1b716aa2e476449f987b9de3e08255b4794eabfd270626de5de18b2f5eff3ef",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
+    },
+    {
+      "name": "dft_count_points",
+      "publisher": "Department for Transport",
+      "url": "https://storage.googleapis.com/dft-statistics/road-traffic/downloads/data-gov-uk/count_points.zip",
+      "file": "data/raw/auxiliary/count_points.zip",
+      "bytes": 1648553,
+      "sha256": "4772abb13761694f35c7aba6d83915c5c168e94a0d25ae401e4b7e84ef7fcff2",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
+    },
+    {
+      "name": "dft_aadf",
+      "publisher": "Department for Transport",
+      "url": "https://storage.googleapis.com/dft-statistics/road-traffic/downloads/data-gov-uk/dft_traffic_counts_aadf.zip",
+      "file": "data/raw/auxiliary/dft_traffic_counts_aadf.zip",
+      "bytes": 19464638,
+      "sha256": "5273cf63da4ca8b317bfe972d8a345e7932db0fff7a7789998a890f0081232b6",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
+    },
+    {
+      "name": "dft_local_authority_traffic",
+      "publisher": "Department for Transport",
+      "url": "https://storage.googleapis.com/dft-statistics/road-traffic/downloads/data-gov-uk/local_authority_traffic.csv",
+      "file": "data/raw/auxiliary/local_authority_traffic.csv",
+      "bytes": 433725,
+      "sha256": "058a61b9f6f7d07a9363c339829c6723fdecc4270f500611d1790eae6da7b9fc",
+      "licence": "Open Government Licence v3.0",
+      "status": "reused"
+    },
+    {
+      "name": "ons_lsoa11_lsoa21_best_fit_v2",
+      "publisher": "Office for National Statistics",
+      "url": "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/LSOA11_LSOA21_LAD22_EW_LU_v2/FeatureServer/0/query",
+      "file": "data/raw/auxiliary/ons_lsoa11_lsoa21_lad22_best_fit_v2.csv",
+      "bytes": 2653270,
+      "sha256": "bf032a5a2decbb6d37ee2bd1f490a6f79a923ff3e8fe2135194e07f910e94ef0",
+      "licence": "Open Government Licence v3.0",
+      "status": "downloaded_or_reused"
     }
   ]
 }

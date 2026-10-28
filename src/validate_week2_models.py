@@ -1,7 +1,10 @@
 """Fail fast on stable Week 2 data contracts."""
+
 import json
 from pathlib import Path
+
 import pandas as pd
+
 ROOT = Path(__file__).resolve().parents[1]
 qa = json.loads((ROOT / "data/processed/week2_qa_summary.json").read_text())
 assert qa["build_status"] == "complete"

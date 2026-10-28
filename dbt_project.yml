@@ -4,6 +4,7 @@ config-version: 2
 profile: road_collision_risk
 model-paths: ["models"]
 test-paths: ["tests"]
+clean-targets: ["target", "dbt_packages", "data/warehouse"]
 models:
   road_collision_risk:
     staging: {+materialized: view}

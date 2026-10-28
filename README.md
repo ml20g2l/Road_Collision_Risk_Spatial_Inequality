@@ -1,5 +1,8 @@
 # Road Collision Risk & Spatial Inequality
 
+[![CI](https://github.com/ml20g2l/Road_Collision_Risk_Spatial_Inequality/actions/workflows/ci.yml/badge.svg)](https://github.com/ml20g2l/Road_Collision_Risk_Spatial_Inequality/actions/workflows/ci.yml)
+[![Full rebuild](https://github.com/ml20g2l/Road_Collision_Risk_Spatial_Inequality/actions/workflows/full-rebuild.yml/badge.svg)](https://github.com/ml20g2l/Road_Collision_Risk_Spatial_Inequality/actions/workflows/full-rebuild.yml)
+
 An end-to-end geospatial analytics engineering project that combines official Great Britain road-collision, traffic-exposure, deprivation, and geography data to distinguish where collisions concentrate from where road risk remains high after accounting for exposure.
 
 The project uses Python for reproducible ingestion and analysis, dbt/PostGIS-style models for transparent transformations, and a Power BI-ready star schema for decision-focused reporting.
@@ -61,13 +64,25 @@ These are descriptive associations, not causal estimates. Resident population is
 
 ```text
 Official source files
-  -> Python ingestion and schema checks
-  -> staging tables
+  -> checksum-pinned Python ingestion
+  -> schema, grain, and join-quality checks
+  -> staging Parquet files
   -> conformed geography and collision context
-  -> exposure and severity models
-  -> validated analytical marts
-  -> Power BI-ready star schema
+  -> exposure, inequality, and severity models
+  -> dbt/DuckDB transformations and tests
+  -> validated Power BI-ready star schema
 ```
+
+## Engineering evidence
+
+- **One-command clean-room build:** `python -m src.pipeline` downloads all official inputs and executes the ordered build and validation stages.
+- **Pinned provenance:** every bulk source is recorded with publisher, URL, byte size, retrieval time, and SHA-256 checksum. Unexpected upstream revisions stop the build.
+- **Layered dbt project:** 8 staging models, 3 intermediate models, and 4 decision marts run locally with DuckDB and require no database server.
+- **Automated quality gates:** pytest covers ingestion, archive handling, orchestration, manifests, semantic contracts, and published outputs. dbt tests enforce primary keys, accepted values, relationships, bounds, exposure guardrails, and fact reconciliation.
+- **Two CI paths:** pull requests use deterministic fixtures for fast tests; a manual full-rebuild workflow downloads the official sources, recreates the analytical products, generates dbt lineage, and preserves run evidence.
+- **Explicit automation boundary:** the validated semantic-model Parquet files, DAX, theme, and model contract are reproducible. The PBIX presentation file remains a versioned Power BI Desktop artifact because Power BI Desktop has no supported headless Linux build interface.
+
+See the [clean-room reproducibility guide](docs/REPRODUCIBILITY.md) and [data contracts](docs/DATA_CONTRACTS.md).
 
 ## Data sources
 
@@ -86,29 +101,38 @@ Downloaded code lists and publisher workbooks are also excluded from version con
 data/metadata/       Source manifest and provenance metadata
 data/public/         Small, publication-ready analytical extracts
 assets/dashboard/    Static previews of the completed Power BI report
-models/              dbt-style staging, intermediate, mart, and QA models
+docs/                Reproducibility and data-contract documentation
+models/              dbt staging, intermediate, and mart models
 notebooks/           Executable audit and insight notebooks
 powerbi/             PBIX report, all-period and 2025 PDF exports, DAX, Power Query, and theme
 reports/             Public English-language findings
 src/                 Download, transformation, validation, and export code
+tests/               dbt singular tests and deterministic fixture builder
+tests_py/            pytest unit and data-contract test suite
+.github/workflows/   Fast CI and full official-source rebuild automation
 ```
 
 ## Reproduce the project
 
 ```powershell
-python -m pip install -r requirements.txt
-python src/download_stats19.py
-python src/audit_stats19.py
-python src/download_week2_geography.py
-python src/build_week2_pipeline.py
-python src/match_collisions_to_aadf.py
-python src/build_powerbi_marts.py
-python src/build_public_insights.py
-python src/validate_week2_models.py
-python src/validate_powerbi_marts.py
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements-lock.txt
+python -m src.pipeline
+dbt build --profiles-dir .
 ```
 
-The official downloads are large. Intermediate data, raw files, local reports, and generated HTML are intentionally excluded from version control.
+The official downloads are large. Intermediate data, raw files, the DuckDB warehouse, and generated documentation are intentionally excluded from version control. After one verified download, use `python -m src.pipeline --skip-download` to rebuild offline.
+
+For fast engineering checks without official downloads:
+
+```powershell
+ruff check src tests_py tests/create_dbt_fixtures.py
+pytest --cov=src.download_sources --cov=src.pipeline --cov-report=term-missing
+python tests/create_dbt_fixtures.py
+dbt build --profiles-dir . --target ci --vars '{powerbi_dir: tests/fixtures/powerbi}'
+```
 
 ## Data-quality decisions
 

@@ -1,20 +1,148 @@
 version: 2
+
 models:
-  - name: stg_stats19_collision
+  - name: stg_fact_collision
+    description: One row per reported STATS19 collision.
     columns:
       - name: collision_index
-        tests: [not_null, unique]
+        data_tests: [not_null, unique]
+      - name: date_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_dim_date')", field: date_key}
       - name: collision_year
-        tests:
-          - accepted_values: {values: [2021, 2022, 2023, 2024, 2025]}
-  - name: stg_iod2025_lsoa
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [2021, 2022, 2023, 2024, 2025]}
+          - relationships:
+              arguments: {to: "ref('stg_dim_year')", field: collision_year}
+      - name: local_authority_highway_current
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_dim_local_authority')", field: local_authority_highway_current}
+      - name: lsoa_code_2021
+        data_tests:
+          - relationships:
+              arguments: {to: "ref('stg_dim_lsoa')", field: lsoa_code_2021}
+      - name: collision_severity
+        data_tests:
+          - accepted_values:
+              arguments: {values: [1, 2, 3]}
+      - name: expected_adjusted_ksi
+        data_tests: [not_null]
+      - name: aadf_match_tier
+        data_tests:
+          - accepted_values:
+              arguments: {values: [high_confidence_100m, sensitivity_250m, not_eligible]}
+
+  - name: stg_fact_local_authority_year_risk
+    description: One row per local authority and collision year.
+    data_tests:
+      - unique:
+          arguments: {column_name: "collision_year || '-' || local_authority_highway_current"}
     columns:
-      - name: lsoa_code
-        tests: [not_null, unique]
+      - name: collision_year
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_dim_year')", field: collision_year}
+      - name: local_authority_highway_current
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_dim_local_authority')", field: local_authority_highway_current}
+      - name: collisions
+        data_tests: [not_null]
+      - name: exposure_available
+        data_tests: [not_null]
+
+  - name: stg_fact_exposure_sensitivity
+    description: Coverage diagnostic at collision-year and exposure-scenario grain.
+    data_tests:
+      - unique:
+          arguments: {column_name: "collision_year || '-' || scenario_key"}
+    columns:
+      - name: scenario_key
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [la_vehicle_miles, aadf_100m_all, aadf_100m_counted, aadf_250m_all]}
+          - relationships:
+              arguments: {to: "ref('stg_dim_exposure_scenario')", field: scenario_key}
+      - name: collision_year
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_dim_year')", field: collision_year}
+      - name: coverage_rate
+        data_tests: [not_null]
+
+  - name: stg_dim_date
+    columns:
+      - name: date_key
+        data_tests: [not_null, unique]
+      - name: date
+        data_tests: [not_null, unique]
+
+  - name: stg_dim_year
+    columns:
+      - name: collision_year
+        data_tests:
+          - not_null
+          - unique
+          - accepted_values:
+              arguments: {values: [2021, 2022, 2023, 2024, 2025]}
+
+  - name: stg_dim_lsoa
+    columns:
+      - name: lsoa_code_2021
+        data_tests: [not_null, unique]
       - name: imd_decile
-        tests:
-          - accepted_values: {values: [1,2,3,4,5,6,7,8,9,10]}
-  - name: int_collision_context
+        data_tests:
+          - accepted_values:
+              arguments: {values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+
+  - name: stg_dim_local_authority
     columns:
-      - name: collision_index
-        tests: [not_null, unique]
+      - name: local_authority_highway_current
+        data_tests: [not_null, unique]
+
+  - name: stg_dim_exposure_scenario
+    columns:
+      - name: scenario_key
+        data_tests: [not_null, unique]
+      - name: supports_absolute_rate
+        data_tests: [not_null]
+
+  - name: mart_national_risk_trend
+    columns:
+      - name: collision_year
+        data_tests: [not_null, unique]
+      - name: collisions
+        data_tests: [not_null]
+
+  - name: mart_deprivation_inequality
+    columns:
+      - name: imd_decile
+        data_tests: [not_null, unique]
+      - name: population_mid_2022
+        data_tests: [not_null]
+
+  - name: mart_road_environment_severity
+    data_tests:
+      - unique:
+          arguments: {column_name: "collision_year || '-' || environment"}
+    columns:
+      - name: environment
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [Urban, Rural]}
+
+  - name: mart_exposure_coverage
+    data_tests:
+      - unique:
+          arguments: {column_name: "collision_year || '-' || scenario_key"}

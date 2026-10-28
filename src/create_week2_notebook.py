@@ -1,24 +1,44 @@
 """Create the reproducible Week 2 join and AADF matching audit notebook."""
+
 from pathlib import Path
+
 import nbformat as nbf
 
 ROOT = Path(__file__).resolve().parents[1]
 nb = nbf.v4.new_notebook()
-nb["metadata"]["kernelspec"] = {"display_name":"Python 3","language":"python","name":"python3"}
+nb["metadata"]["kernelspec"] = {"display_name": "Python 3", "language": "python", "name": "python3"}
 nb["cells"] = [
-    nbf.v4.new_markdown_cell("""# Week 2 — Join & AADF Matching Audit\n\n## tl;dr\n\nThis executable quality-audit notebook verifies deprivation join coverage before and after LSOA geography conversion, local-authority traffic coverage, and the distance distribution between collision locations and AADF count points."""),
-    nbf.v4.new_markdown_cell("""## Context & Methods\n\n### Key Assumptions\n\n- IoD25 uses 2021 LSOA geography and is applied only to collisions in England.\n- Historic LSOA codes are mapped to 2021 codes using the ONS best-fit lookup.\n- AADF matching selects the nearest BNG count point among same-year candidates with the same normalised road identifier.\n- Matches within 100 metres are high confidence; matches within 250 metres are retained for sensitivity analysis.\n- Sources: DfT STATS19, DfT Road Traffic, MHCLG IoD25 v2, and the ONS LSOA lookup."""),
-    nbf.v4.new_code_cell("""from pathlib import Path\nimport json\nimport pandas as pd\nimport matplotlib.pyplot as plt\nROOT = Path.cwd().parent if Path.cwd().name == 'notebooks' else Path.cwd()\nplt.rcParams.update({'figure.figsize':(9,5),'axes.spines.top':False,'axes.spines.right':False,'axes.grid':True,'grid.alpha':.2,'font.size':10})\nCOLORS = {'before':'#9CA3AF','after':'#2563EB','counted':'#D97706','estimated':'#1D4ED8'}"""),
+    nbf.v4.new_markdown_cell(
+        """# Week 2 — Join & AADF Matching Audit\n\n## tl;dr\n\nThis executable quality-audit notebook verifies deprivation join coverage before and after LSOA geography conversion, local-authority traffic coverage, and the distance distribution between collision locations and AADF count points."""
+    ),
+    nbf.v4.new_markdown_cell(
+        """## Context & Methods\n\n### Key Assumptions\n\n- IoD25 uses 2021 LSOA geography and is applied only to collisions in England.\n- Historic LSOA codes are mapped to 2021 codes using the ONS best-fit lookup.\n- AADF matching selects the nearest BNG count point among same-year candidates with the same normalised road identifier.\n- Matches within 100 metres are high confidence; matches within 250 metres are retained for sensitivity analysis.\n- Sources: DfT STATS19, DfT Road Traffic, MHCLG IoD25 v2, and the ONS LSOA lookup."""
+    ),
+    nbf.v4.new_code_cell(
+        """from pathlib import Path\nimport json\nimport pandas as pd\nimport matplotlib.pyplot as plt\nROOT = Path.cwd().parent if Path.cwd().name == 'notebooks' else Path.cwd()\nplt.rcParams.update({'figure.figsize':(9,5),'axes.spines.top':False,'axes.spines.right':False,'axes.grid':True,'grid.alpha':.2,'font.size':10})\nCOLORS = {'before':'#9CA3AF','after':'#2563EB','counted':'#D97706','estimated':'#1D4ED8'}"""
+    ),
     nbf.v4.new_markdown_cell("## Data"),
-    nbf.v4.new_code_cell("""context = pd.read_parquet(ROOT/'data/intermediate/int_collision_context.parquet', columns=['collision_index','collision_year','lsoa_of_accident_location','imd_decile'])\niod = pd.read_parquet(ROOT/'data/staging/stg_iod2025_lsoa.parquet', columns=['lsoa_code'])\nmatches = pd.read_parquet(ROOT/'data/intermediate/int_collision_aadf_match.parquet')\nqa = json.loads((ROOT/'data/processed/week2_qa_summary.json').read_text())\nmatch_qa = json.loads((ROOT/'data/processed/week2_aadf_match_summary.json').read_text())\n{'collisions':len(context),'aadf_matches':len(matches),'iod_lsoas':len(iod)}"""),
+    nbf.v4.new_code_cell(
+        """context = pd.read_parquet(ROOT/'data/intermediate/int_collision_context.parquet', columns=['collision_index','collision_year','lsoa_of_accident_location','imd_decile'])\niod = pd.read_parquet(ROOT/'data/staging/stg_iod2025_lsoa.parquet', columns=['lsoa_code'])\nmatches = pd.read_parquet(ROOT/'data/intermediate/int_collision_aadf_match.parquet')\nqa = json.loads((ROOT/'data/processed/week2_qa_summary.json').read_text())\nmatch_qa = json.loads((ROOT/'data/processed/week2_aadf_match_summary.json').read_text())\n{'collisions':len(context),'aadf_matches':len(matches),'iod_lsoas':len(iod)}"""
+    ),
     nbf.v4.new_markdown_cell("## Results\n\n### 1. IoD join coverage before and after LSOA conversion"),
-    nbf.v4.new_code_cell("""england = context.lsoa_of_accident_location.astype('string').str.startswith('E',na=False)\ndirect_codes = set(iod.lsoa_code)\njoin_by_year = context[england].groupby('collision_year').agg(\n    rows=('collision_index','size'),\n    direct=('lsoa_of_accident_location',lambda s:s.isin(direct_codes).sum()),\n    after=('imd_decile',lambda s:s.notna().sum())\n).reset_index()\njoin_by_year['before_rate'] = join_by_year.direct/join_by_year.rows\njoin_by_year['after_rate'] = join_by_year.after/join_by_year.rows\njoin_by_year[['collision_year','rows','before_rate','after_rate']]"""),
-    nbf.v4.new_code_cell("""ax = join_by_year.plot(x='collision_year',y=['before_rate','after_rate'],kind='bar',color=[COLORS['before'],COLORS['after']],width=.72)\nax.set(title='IoD join coverage before and after ONS LSOA crosswalk',xlabel='Collision year',ylabel='Join rate',ylim=(0.88,1.01))\nax.legend(['Direct code only','After crosswalk'],frameon=False,loc='lower right')\nax.yaxis.set_major_formatter(lambda x,pos:f'{x:.0%}')\nplt.tight_layout(); plt.show()"""),
+    nbf.v4.new_code_cell(
+        """england = context.lsoa_of_accident_location.astype('string').str.startswith('E',na=False)\ndirect_codes = set(iod.lsoa_code)\njoin_by_year = context[england].groupby('collision_year').agg(\n    rows=('collision_index','size'),\n    direct=('lsoa_of_accident_location',lambda s:s.isin(direct_codes).sum()),\n    after=('imd_decile',lambda s:s.notna().sum())\n).reset_index()\njoin_by_year['before_rate'] = join_by_year.direct/join_by_year.rows\njoin_by_year['after_rate'] = join_by_year.after/join_by_year.rows\njoin_by_year[['collision_year','rows','before_rate','after_rate']]"""
+    ),
+    nbf.v4.new_code_cell(
+        """ax = join_by_year.plot(x='collision_year',y=['before_rate','after_rate'],kind='bar',color=[COLORS['before'],COLORS['after']],width=.72)\nax.set(title='IoD join coverage before and after ONS LSOA crosswalk',xlabel='Collision year',ylabel='Join rate',ylim=(0.88,1.01))\nax.legend(['Direct code only','After crosswalk'],frameon=False,loc='lower right')\nax.yaxis.set_major_formatter(lambda x,pos:f'{x:.0%}')\nplt.tight_layout(); plt.show()"""
+    ),
     nbf.v4.new_markdown_cell("### 2. Nearest AADF match distance"),
-    nbf.v4.new_code_cell("""band_order=['<=50m','51-100m','101-250m','251-500m','501-1000m','>1000m']\nbands = matches.match_band.astype('string').value_counts().reindex(band_order).fillna(0).astype(int)\nax = bands.plot(kind='bar',color='#2563EB')\nax.set(title='Same-year, same-road AADF match distance',xlabel='Nearest count-point distance',ylabel='Matched collisions')\nax.tick_params(axis='x',rotation=0)\nplt.tight_layout(); plt.show()\nbands.to_frame('collisions')"""),
+    nbf.v4.new_code_cell(
+        """band_order=['<=50m','51-100m','101-250m','251-500m','501-1000m','>1000m']\nbands = matches.match_band.astype('string').value_counts().reindex(band_order).fillna(0).astype(int)\nax = bands.plot(kind='bar',color='#2563EB')\nax.set(title='Same-year, same-road AADF match distance',xlabel='Nearest count-point distance',ylabel='Matched collisions')\nax.tick_params(axis='x',rotation=0)\nplt.tight_layout(); plt.show()\nbands.to_frame('collisions')"""
+    ),
     nbf.v4.new_markdown_cell("### 3. Distance thresholds and observation methods"),
-    nbf.v4.new_code_cell("""threshold_rows=[]\nfor threshold in [50,100,250,500]:\n    subset=matches[matches.distance_m<=threshold]\n    threshold_rows.append({'threshold_m':threshold,'matched':len(subset),'eligible_coverage':len(subset)/match_qa['eligible_numbered_road_collisions'],'counted_share':subset.estimation_method.eq('Counted').mean()})\nthresholds=pd.DataFrame(threshold_rows)\nthresholds.style.format({'eligible_coverage':'{:.1%}','counted_share':'{:.1%}'})"""),
-    nbf.v4.new_markdown_cell("""## Takeaways\n\n- After the ONS best-fit conversion, the England-to-IoD join reaches 100% in every year.\n- Same-road AADF candidates are widely available, but nearby count points remain limited.\n- The 100-metre rule is reserved for high-confidence analysis; the 250-metre rule is used for sensitivity analysis.\n- Link-level results must distinguish `Counted` from `Estimated` observations, while local-authority vehicle miles remain the default exposure measure for the full analysis.""")
+    nbf.v4.new_code_cell(
+        """threshold_rows=[]\nfor threshold in [50,100,250,500]:\n    subset=matches[matches.distance_m<=threshold]\n    threshold_rows.append({'threshold_m':threshold,'matched':len(subset),'eligible_coverage':len(subset)/match_qa['eligible_numbered_road_collisions'],'counted_share':subset.estimation_method.eq('Counted').mean()})\nthresholds=pd.DataFrame(threshold_rows)\nthresholds.style.format({'eligible_coverage':'{:.1%}','counted_share':'{:.1%}'})"""
+    ),
+    nbf.v4.new_markdown_cell(
+        """## Takeaways\n\n- After the ONS best-fit conversion, the England-to-IoD join reaches 100% in every year.\n- Same-road AADF candidates are widely available, but nearby count points remain limited.\n- The 100-metre rule is reserved for high-confidence analysis; the 250-metre rule is used for sensitivity analysis.\n- Link-level results must distinguish `Counted` from `Estimated` observations, while local-authority vehicle miles remain the default exposure measure for the full analysis."""
+    ),
 ]
 out = ROOT / "notebooks/02_join_and_aadf_match_audit.ipynb"
 nbf.write(nb, out)

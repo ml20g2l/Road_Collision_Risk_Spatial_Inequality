@@ -4,7 +4,6 @@ from pathlib import Path
 
 import nbformat as nbf
 
-
 ROOT = Path(__file__).resolve().parents[1]
 nb = nbf.v4.new_notebook()
 nb["metadata"]["kernelspec"] = {
@@ -70,7 +69,7 @@ speed.round(2)"""),
 2. Treat rural severity as a separate intervention track focused on road geometry, speed environment, emergency response, and collision type.
 3. Use adjusted KSI per billion vehicle miles for local-authority risk comparisons; keep the raw measure visible for transparency.
 4. Do not use the resident-normalised deprivation result as an exposure-adjusted road-risk measure.
-5. Extend the analysis with road segment geometry and multivariable modelling before making causal or site-specific investment claims.""")
+5. Extend the analysis with road segment geometry and multivariable modelling before making causal or site-specific investment claims."""),
 ]
 
 out = ROOT / "notebooks" / "04_decision_insights.ipynb"

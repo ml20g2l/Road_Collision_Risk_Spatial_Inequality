@@ -5,9 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
@@ -49,14 +48,12 @@ def main() -> None:
             }
         )
     payload = {
-        "retrieved_at_utc": datetime.now(timezone.utc).isoformat(),
+        "retrieved_at_utc": datetime.now(UTC).isoformat(),
         "snapshot": "DfT STATS19 2025 final",
         "license": "Open Government Licence v3.0",
         "sources": manifest,
     }
-    (META_DIR / "source_manifest.json").write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    (META_DIR / "source_manifest.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 

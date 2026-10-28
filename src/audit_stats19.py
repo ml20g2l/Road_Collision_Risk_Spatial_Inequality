@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data" / "raw"
 META_DIR = ROOT / "data" / "metadata"
@@ -79,9 +78,7 @@ def profile_table(name: str, df: pd.DataFrame) -> dict:
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     frames = {name: pd.read_csv(path, low_memory=False) for name, path in FILES.items()}
-    multiyear = {
-        name: pd.read_csv(path, low_memory=False) for name, path in MULTIYEAR_FILES.items()
-    }
+    multiyear = {name: pd.read_csv(path, low_memory=False) for name, path in MULTIYEAR_FILES.items()}
     profiles = {name: profile_table(name, df) for name, df in frames.items()}
 
     collisions = frames["collision"]
@@ -99,10 +96,7 @@ def main() -> None:
 
     date_parsed = pd.to_datetime(collisions["date"], format="%d/%m/%Y", errors="coerce")
     time_parsed = pd.to_datetime(collisions["time"], format="%H:%M", errors="coerce")
-    valid_coords = (
-        collisions["longitude"].between(-9, 3)
-        & collisions["latitude"].between(49, 61)
-    )
+    valid_coords = collisions["longitude"].between(-9, 3) & collisions["latitude"].between(49, 61)
 
     casualty_vehicle_keys = vehicles[["collision_index", "vehicle_reference"]].drop_duplicates()
     casualty_vehicle_check = casualties.merge(
@@ -114,10 +108,10 @@ def main() -> None:
     collision_quality = {
         "invalid_date_rows": int(date_parsed.isna().sum()),
         "invalid_time_rows": int(time_parsed.isna().sum()),
-        "missing_coordinate_rows": int(
-            collisions[["longitude", "latitude"]].isna().any(axis=1).sum()
+        "missing_coordinate_rows": int(collisions[["longitude", "latitude"]].isna().any(axis=1).sum()),
+        "out_of_gb_coordinate_rows": int(
+            (~valid_coords & collisions[["longitude", "latitude"]].notna().all(axis=1)).sum()
         ),
-        "out_of_gb_coordinate_rows": int((~valid_coords & collisions[["longitude", "latitude"]].notna().all(axis=1)).sum()),
         "unexpected_collision_severity_rows": int((~collisions["collision_severity"].isin([1, 2, 3])).sum()),
         "vehicle_count_mismatch_collisions": int(
             stated_vehicle_counts.ne(vehicle_counts.reindex(stated_vehicle_counts.index, fill_value=0)).sum()
@@ -186,12 +180,7 @@ def main() -> None:
         "casualty_rows_without_matching_vehicle_reference": int(casualty_vehicle_check["_vehicle_match"].isna().sum()),
     }
 
-    severity_counts = (
-        collisions.groupby("collision_severity", dropna=False)
-        .size()
-        .rename("collisions")
-        .reset_index()
-    )
+    severity_counts = collisions.groupby("collision_severity", dropna=False).size().rename("collisions").reset_index()
     local_authority_summary = (
         collisions.assign(serious_or_fatal=collisions["collision_severity"].isin([1, 2]))
         .groupby("local_authority_highway_current", dropna=False)
@@ -213,15 +202,13 @@ def main() -> None:
 
     guide_path = META_DIR / "dft-road-safety-open-dataset-data-guide-2025.xlsx"
     guide = pd.read_excel(guide_path, sheet_name="2024_code_list")
-    guide.columns = [
-        str(c).strip().lower().replace(" ", "_").replace("/", "_") for c in guide.columns
-    ]
+    guide.columns = [str(c).strip().lower().replace(" ", "_").replace("/", "_") for c in guide.columns]
     guide.to_csv(META_DIR / "stats19_2025_code_list.csv", index=False)
 
     unknown_codes = guide.loc[
-        guide["label"].astype(str).str.contains(
-            r"unknown|no data|not known|data missing", case=False, regex=True, na=False
-        ),
+        guide["label"]
+        .astype(str)
+        .str.contains(r"unknown|no data|not known|data missing", case=False, regex=True, na=False),
         ["table", "field_name", "code_format", "label"],
     ].copy()
     coded_missingness_rows = []
@@ -263,9 +250,7 @@ def main() -> None:
             "highest_coded_missingness": coded_missingness.head(12).to_dict(orient="records"),
         },
     }
-    (OUT_DIR / "audit_summary.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    (OUT_DIR / "audit_summary.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 
