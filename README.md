@@ -30,8 +30,6 @@ The completed four-page report connects exposure-adjusted road risk, community c
 
 The `.pbix` file is designed for local use in Power BI Desktop. The PDF and preview images provide a static view of the completed report without requiring Power BI Service access.
 
-For a detailed explanation of the concepts, methods, lessons, reuse options, and relevant career paths, read the [project learning guide](reports/project_learning_guide.md).
-
 ## Why this project matters
 
 Collision counts alone can overstate risk in places with more traffic and understate the social burden in deprived communities. This project separates three related questions:
