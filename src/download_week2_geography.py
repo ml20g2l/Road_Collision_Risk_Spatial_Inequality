@@ -12,7 +12,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "data/raw/auxiliary/ons_lsoa11_lsoa21_lad22_best_fit_v2.csv"
-EXPECTED_SHA256 = "bf032a5a2decbb6d37ee2bd1f490a6f79a923ff3e8fe2135194e07f910e94ef0"
+EXPECTED_SHA256 = "2fb490d5193a30be0bbcd2c1963c5e131584b14145e3a78eafc33129adcc5f72"
 SERVICE = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/LSOA11_LSOA21_LAD22_EW_LU_v2/FeatureServer/0/query"
 
 
@@ -55,7 +55,9 @@ def main():
         raise RuntimeError(f"Unexpected lookup grain: service={count}, downloaded={len(frame)}")
     OUT.parent.mkdir(parents=True, exist_ok=True)
     temporary = OUT.with_suffix(".csv.part")
-    frame.to_csv(temporary, index=False)
+    # Fix the line terminator so the generated snapshot has the same checksum
+    # on Windows and Linux runners.
+    frame.to_csv(temporary, index=False, lineterminator="\n")
     actual = sha256(temporary)
     if actual != EXPECTED_SHA256:
         temporary.unlink(missing_ok=True)

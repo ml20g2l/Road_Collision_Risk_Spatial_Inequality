@@ -1,7 +1,7 @@
 {
   "snapshot": "Pinned 2021-2025 official-source build",
   "snapshot_date": "2026-10-26",
-  "retrieved_at_utc": "2026-10-28T14:39:55.067171+00:00",
+  "retrieved_at_utc": "2026-10-28T15:05:49.052206+00:00",
   "sources": [
     {
       "name": "stats19_collision_2025",
@@ -118,8 +118,8 @@
       "publisher": "Office for National Statistics",
       "url": "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/LSOA11_LSOA21_LAD22_EW_LU_v2/FeatureServer/0/query",
       "file": "data/raw/auxiliary/ons_lsoa11_lsoa21_lad22_best_fit_v2.csv",
-      "bytes": 2653270,
-      "sha256": "bf032a5a2decbb6d37ee2bd1f490a6f79a923ff3e8fe2135194e07f910e94ef0",
+      "bytes": 2618516,
+      "sha256": "2fb490d5193a30be0bbcd2c1963c5e131584b14145e3a78eafc33129adcc5f72",
       "licence": "Open Government Licence v3.0",
       "status": "downloaded_or_reused"
     }
